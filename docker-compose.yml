@@ -7,15 +7,62 @@ services:
         rabbitmq:
             condition: service_healthy
     environment:
-      - SPRING_PORT=8083
-      - RABBITMQ_URL=rabbitmq
-      - SPRING_RABBITMQ_HOST=rabbitmq
-      - SPRING_RABBITMQ_PORT=5672
-      - SPRING_RABBITMQ_USERNAME=fiap
-      - SPRING_RABBITMQ_PASSWORD=senhafiap
+       SPRING_PORT: 8083
+       RABBITMQ_URL: rabbitmq
+       SPRING_RABBITMQ_HOST: rabbitmq
+       SPRING_RABBITMQ_PORT: 5672
+       SPRING_RABBITMQ_USERNAME: fiap
+       SPRING_RABBITMQ_PASSWORD: senhafiap
     networks:
       - rabbitmq-network
 
+
+  hospitech-appointment-service-appointment:
+    image: caiomurakami/hospitech-appointment-service-appointment:1.0
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8084:8084"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      SPRING_PORT: 8084
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/hospitech?useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_URL_FLYWAY: jdbc:mysql://mysql:3306/hospitech
+      SPRING_DATASOURCE_USERNAME: user
+      SPRING_DATASOURCE_PASSWORD: password
+      RABBITMQ_URL: rabbitmq
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: fiap
+      SPRING_RABBITMQ_PASSWORD: senhafiap
+    networks:
+      - app-network
+
+  mysql:
+    image: mysql:8.4.0
+    container_name: mysql
+    environment:
+      MYSQL_DATABASE: hospitech
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+      MYSQL_TCP_PORT: 3306
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - app-network
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+    restart: always
+    
   rabbitmq:
     image: rabbitmq:3.9-management
     container_name: rabbitmq
@@ -39,7 +86,10 @@ services:
 volumes:
   rabbitmq-lib:
   rabbitmq-log:
+  mysql_data:
 
 networks:
   rabbitmq-network:
     name: rabbitmq-network
+  app-network:
+    driver: bridge
