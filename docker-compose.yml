@@ -38,6 +38,21 @@ services:
       SPRING_RABBITMQ_PORT: 5672
       SPRING_RABBITMQ_USERNAME: fiap
       SPRING_RABBITMQ_PASSWORD: senhafiap
+
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL: "true"
+      SPRING_JPA_SHOW_SQL: "false"
+
+      # Flyway:
+      SPRING_FLYWAY_ENABLED: "true"
+      SPRING_FLYWAY_URL: jdbc:mysql://mysql:3306/hospitech
+      SPRING_FLYWAY_USER: user
+      SPRING_FLYWAY_PASSWORD: password
+
+      # GraphQL
+      SPRING_GRAPHQL_PATH: /graphql
+      SPRING_GRAPHQL_GRAPHIQL_ENABLED: "true"      # abre /graphiql
+
     networks:
       - app-network
 
