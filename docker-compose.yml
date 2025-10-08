@@ -16,7 +16,6 @@ services:
     networks:
       - rabbitmq-network
 
-
   hospitech-appointment-service-appointment:
     image: caiomurakami/hospitech-appointment-service-appointment:1.0
     build:
@@ -55,6 +54,7 @@ services:
 
     networks:
       - app-network
+      - rabbitmq-network
 
   mysql:
     image: mysql:8.4.0
@@ -71,6 +71,7 @@ services:
       - mysql_data:/var/lib/mysql
     networks:
       - app-network
+      - rabbitmq-network
     healthcheck:
       test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
       interval: 5s
@@ -94,8 +95,8 @@ services:
       - rabbitmq-network
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
-      interval: 30s
-      timeout: 30s
+      interval: 5s
+      timeout: 20s
       retries: 3
 
 volumes:
@@ -105,6 +106,6 @@ volumes:
 
 networks:
   rabbitmq-network:
-    name: rabbitmq-network
+    driver: bridge
   app-network:
     driver: bridge
